@@ -45,9 +45,9 @@ def load_data(dataset_str):
     for i in range(len(names)):
         with open("../GCNdata/ind.{}.{}".format(dataset_str, names[i]), 'rb') as f:
             if sys.version_info > (3, 0):
-                objects.append(pkl.load(f, encoding='latin1'))
+                objects.append(pickle.load(f, encoding='latin1'))
             else:
-                objects.append(pkl.load(f))
+                objects.append(pickle.load(f))
 
     x, y, tx, ty, allx, ally, graph = tuple(objects)
     test_idx_reorder = parse_index_file("../GCNdata/ind.{}.test.index".format(dataset_str))

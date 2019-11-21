@@ -17,7 +17,7 @@ class singleGCNLayer(nn.Module):
 	def forward(self, embeddings, adj):
 		n = embeddings.size()[0]
 		ret = torch.sparse.mm(adj, embeddings).matmul(self.W)
-		if self.nolinear == "ReLU"
+		if self.nolinear == "ReLU":
 			ret = F.relu(ret)
 		return ret
 
