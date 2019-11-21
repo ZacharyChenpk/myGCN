@@ -7,6 +7,20 @@ import pickle
 import sys
 import networkx as nx
 
+def parse_index_file(filename):
+    """Parse index file."""
+    index = []
+    for line in open(filename):
+        index.append(int(line.strip()))
+    return index
+
+
+def sample_mask(idx, l):
+    """Create mask."""
+    mask = np.zeros(l)
+    mask[idx] = 1
+    return np.array(mask, dtype=np.bool)
+
 def load_data(dataset_str):
 
     """
@@ -29,14 +43,14 @@ def load_data(dataset_str):
     names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
     objects = []
     for i in range(len(names)):
-        with open("data/ind.{}.{}".format(dataset_str, names[i]), 'rb') as f:
+        with open("../GCNdata/ind.{}.{}".format(dataset_str, names[i]), 'rb') as f:
             if sys.version_info > (3, 0):
                 objects.append(pkl.load(f, encoding='latin1'))
             else:
                 objects.append(pkl.load(f))
 
     x, y, tx, ty, allx, ally, graph = tuple(objects)
-    test_idx_reorder = parse_index_file("data/ind.{}.test.index".format(dataset_str))
+    test_idx_reorder = parse_index_file("../GCNdata/ind.{}.test.index".format(dataset_str))
     test_idx_range = np.sort(test_idx_reorder)
 
     if dataset_str == 'citeseer':
@@ -73,3 +87,12 @@ def load_data(dataset_str):
     y_test[test_mask, :] = labels[test_mask, :]
 
     return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
+
+def normalize(adj):
+	n = adj.shape[0]
+	adj2 = adj + sp.diags([1]*n)
+	rowsum = np.array(adj2.sum(1))
+	dsqrt = np.power(rowsum, -0.5).reshape(-1)
+	dsqrt[np.isinf(dsqrt)] = 0.
+	dsqrt = sp.diags(dsqrt)
+	return dsqrt.dot(adj2).dot(dsqrt)
