@@ -64,7 +64,7 @@ def load_data(dataset_str):
         ty_extended[test_idx_range-min(test_idx_range), :] = ty
         ty = ty_extended
 
-    features = sp.vstack((allx, tx)).tolil()
+    features = sp.vstack((allx, tx)).todense()
     features[test_idx_reorder, :] = features[test_idx_range, :]
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
 
@@ -100,4 +100,5 @@ def normalize(adj):
 def cal_accuracy(output, y_val, val_mask):
 	output = output[val_mask]
 	y_val = y_val[val_mask]
-	
+	out_label = torch.argmax(output, dim=1)
+	return sum([y_val[i][out_label[i]] for i in range(val_mask.shape[0])])

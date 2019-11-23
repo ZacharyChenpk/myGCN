@@ -33,11 +33,11 @@ norm_adj = normalize(adj)
 
 i = torch.LongTensor([norm_adj.row, norm_adj.col])
 v = torch.FloatTensor(norm_adj.data)
-norm_adj = torch.sparse.FloatTensor(i,v, adj.shape, requires_grad=False)
-features = torch.FloatTensor(features, requires_grad=False)
-y_train = torch.FloatTensor(features, requires_grad=False)
-y_val = torch.FloatTensor(features, requires_grad=False)
-y_test = torch.FloatTensor(features, requires_grad=False)
+norm_adj = torch.sparse.FloatTensor(i,v, adj.shape)
+features = torch.tensor(features, requires_grad=False)
+y_train = torch.tensor(y_train, requires_grad=False)
+y_val = torch.tensor(y_val, requires_grad=False)
+y_test = torch.tensor(y_test, requires_grad=False)
 
 load_from = False
 gcn = GCN(embsize, hidsize, nclass)
