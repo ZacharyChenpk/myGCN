@@ -4,15 +4,18 @@ import json
 from scipy import sparse as sp
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 
 class singleGCNLayer(nn.Module):
 
 	def __init__(self, embsize, outsize, nolinear="NO"):
-		super(RenormalizeGCNLayer, self).__init__()
-		self.W = nn.Parameter(torch.zeros([embsize, outsize]))
+		super(singleGCNLayer, self).__init__()
+		self.W = nn.Parameter(torch.FloatTensor(embsize, outsize))
 		self.nolinear = nolinear
 		self.embsize = embsize
 		self.outsize = outsize
+		stdv = 1./math.sqrt(self.W.size(1))
+		self.W.data.uniform_(-stdv, stdv)
 
 	def forward(self, embeddings, adj):
 		n = embeddings.size()[0]

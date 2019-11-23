@@ -34,16 +34,16 @@ norm_adj = normalize(adj)
 i = torch.LongTensor([norm_adj.row, norm_adj.col])
 v = torch.FloatTensor(norm_adj.data)
 norm_adj = torch.sparse.FloatTensor(i,v, adj.shape)
-features = torch.tensor(features, requires_grad=False)
-y_train = torch.tensor(y_train, requires_grad=False)
-y_val = torch.tensor(y_val, requires_grad=False)
-y_test = torch.tensor(y_test, requires_grad=False)
+features = torch.tensor(features, dtype=torch.float, requires_grad=False)
+y_train = torch.tensor(y_train, dtype=torch.long, requires_grad=False)
+y_val = torch.tensor(y_val, dtype=torch.long, requires_grad=False)
+y_test = torch.tensor(y_test, dtype=torch.long, requires_grad=False)
 
 load_from = False
 gcn = GCN(embsize, hidsize, nclass)
 if load_from:
 	gcn = torch.load(load_from)
-optimizer = optim.Adam(gcn.parameters(), lr=lr, weight_decay=weight_decay)
+optimizer = torch.optim.Adam(gcn.parameters(recurse=True), lr=lr, weight_decay=weight_decay)
 
 for epoch in range(200):
 	t = time.time()
@@ -51,7 +51,7 @@ for epoch in range(200):
 	optimizer.zero_grad()
 	output = gcn(features, norm_adj)
 	pred = output[train_mask]
-	ans = y_train[train_mask]
+	ans = torch.argmax(y_train[train_mask],dim=1)
 	loss = F.nll_loss(pred, ans)
 	train_acc = cal_accuracy(output, y_train, train_mask)
 	loss.backward()
@@ -59,12 +59,12 @@ for epoch in range(200):
 
 	gcn.eval()
 	pred = output[val_mask]
-	ans = y_train[val_mask]
+	ans = torch.argmax(y_train[val_mask],dim=1)
 	val_loss = F.nll_loss(pred, ans)
 	val_acc = cal_accuracy(output, y_val, val_mask)
 
 	print("epoch:", epoch, "time:", time.time()-t)
-	print("train_loss:",loss, "train_acc:", train_acc)
-	print("val_loss:", val_loss, "val_acc:", val_acc)
+	print("train_loss:",float(loss), "train_acc:", float(train_acc))
+	print("val_loss:", float(val_loss), "val_acc:", float(val_acc))
 
 torch.save(gcn, "gcn_model")
