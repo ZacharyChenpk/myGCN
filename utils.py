@@ -95,4 +95,9 @@ def normalize(adj):
 	dsqrt = np.power(rowsum, -0.5).reshape(-1)
 	dsqrt[np.isinf(dsqrt)] = 0.
 	dsqrt = sp.diags(dsqrt)
-	return dsqrt.dot(adj2).dot(dsqrt)
+	return sp.coo_matrix(dsqrt.dot(adj2).dot(dsqrt))
+
+def cal_accuracy(output, y_val, val_mask):
+	output = output[val_mask]
+	y_val = y_val[val_mask]
+	
