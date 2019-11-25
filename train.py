@@ -8,11 +8,19 @@ import sys
 import networkx as nx
 import os
 import time
+import argparse
 
 from utils import load_data, normalize, cal_accuracy
 from model import GCN
 
-datastr = "citeseer"
+parser = argparse.ArgumentParser()
+parser.add_argument("--datastr", type=str, help="name of database", default='citeseer')
+parser.add_argument("--epoch", type=int, help="number of training epoches", default=20)
+parser.add_argument("--hidsize", type=int, help="the size of hidden states", default=300)
+parser.add_argument("--lr", type=float, help="learning rate", default=0.01)
+args = parser.parse_args()
+
+datastr = args.datastr
 
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(datastr)
 #adj = nx.to_scipy_sparse_matrix(adj)
@@ -25,8 +33,8 @@ n_total = adj.shape[0]
 n_train = sum(np.ones(n_total)[train_mask])
 n_test = n_total-n_train
 nclass = y_train.shape[1]
-hidsize = 300
-lr = 0.01
+hidsize = args.hidsize
+lr = args.lr
 weight_decay = 1e-3
 print("n_train:",n_train)
 norm_adj = normalize(adj)
@@ -45,7 +53,7 @@ if load_from:
 	gcn = torch.load(load_from)
 optimizer = torch.optim.Adam(gcn.parameters(recurse=True), lr=lr, weight_decay=weight_decay)
 
-for epoch in range(20):
+for epoch in range(args.epoch):
 	t = time.time()
 	gcn.train()
 	optimizer.zero_grad()
