@@ -35,5 +35,5 @@ class GCN(nn.Module):
 		n = embeddings.size()[0]
 		embeddings = self.layer1(embeddings, adj)
 		embeddings = self.layer2(embeddings, adj)
-		embeddings = torch.softmax(embeddings, dim = 1)
+		#embeddings = torch.softmax(embeddings, dim = 1)
 		return embeddings

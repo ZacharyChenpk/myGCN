@@ -45,22 +45,23 @@ if load_from:
 	gcn = torch.load(load_from)
 optimizer = torch.optim.Adam(gcn.parameters(recurse=True), lr=lr, weight_decay=weight_decay)
 
-for epoch in range(200):
+for epoch in range(20):
 	t = time.time()
 	gcn.train()
 	optimizer.zero_grad()
 	output = gcn(features, norm_adj)
 	pred = output[train_mask]
 	ans = torch.argmax(y_train[train_mask],dim=1)
-	loss = F.nll_loss(pred, ans)
+	loss = F.cross_entropy(pred, ans)
 	train_acc = cal_accuracy(output, y_train, train_mask)
 	loss.backward()
 	optimizer.step()
+	#print(torch.min(pred), torch.max(pred))
 
 	gcn.eval()
 	pred = output[val_mask]
 	ans = torch.argmax(y_train[val_mask],dim=1)
-	val_loss = F.nll_loss(pred, ans)
+	val_loss = F.cross_entropy(pred, ans)
 	val_acc = cal_accuracy(output, y_val, val_mask)
 
 	print("epoch:", epoch, "time:", time.time()-t)

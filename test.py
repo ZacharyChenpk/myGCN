@@ -16,9 +16,9 @@ datastr = "citeseer"
 
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(datastr)
 #adj = nx.to_scipy_sparse_matrix(adj)
-adj_n = normalize(adj)
+norm_adj = normalize(adj)
 
-print(adj.shape, adj_n.shape, features.shape, y_train.shape, train_mask.shape)
+#print(adj.shape, adj_n.shape, features.shape, y_train.shape, train_mask.shape)
 i = torch.LongTensor([norm_adj.row, norm_adj.col])
 v = torch.FloatTensor(norm_adj.data)
 norm_adj = torch.sparse.FloatTensor(i,v, adj.shape)
