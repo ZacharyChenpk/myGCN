@@ -88,17 +88,27 @@ def load_data(dataset_str):
 
     return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
 
-def normalize(adj):
-	n = adj.shape[0]
-	adj2 = adj + sp.diags([1]*n)
-	rowsum = np.array(adj2.sum(1))
-	dsqrt = np.power(rowsum, -0.5).reshape(-1)
-	dsqrt[np.isinf(dsqrt)] = 0.
-	dsqrt = sp.diags(dsqrt)
-	return sp.coo_matrix(dsqrt.dot(adj2).dot(dsqrt))
+def normalize(adj, is_feature=False):
+    if not is_feature:
+        adj = adj + adj.T.multiply(adj.T > adj) - adj.T.multiply(adj.T > adj)
+        n = adj.shape[0]
+        adj = adj + sp.diags([1]*n)
+    rowsum = np.array(adj.sum(1))
+    dsqrt = np.power(rowsum, -0.5).reshape(-1)
+    dsqrt[np.isinf(dsqrt)] = 0.
+    dsqrt = sp.diags(dsqrt)
+    return sp.coo_matrix(dsqrt.dot(adj).dot(dsqrt))
+
+def feature_norm(f):
+    rowsum = np.array(f.sum(1))
+    r_inv = np.power(rowsum, -1).flatten()
+    r_inv[np.isinf(r_inv)] = 0.
+    r_mat_inv = sp.diags(r_inv)
+    f = r_mat_inv.dot(f)
+    return f
 
 def cal_accuracy(output, y_val, val_mask):
-	output = output[val_mask]
-	y_val = y_val[val_mask]
-	out_label = torch.argmax(output, dim=1)
-	return sum([y_val[i][out_label[i]] for i in range(y_val.shape[0])])/float(y_val.shape[0])
+    output = output[val_mask]
+    y_val = y_val[val_mask]
+    out_label = torch.argmax(output, dim=1)
+    return sum([y_val[i][out_label[i]] for i in range(y_val.shape[0])])/float(y_val.shape[0])
