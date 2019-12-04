@@ -57,6 +57,7 @@ if load_from:
 	gcn = torch.load(load_from)
 optimizer = torch.optim.Adam(gcn.parameters(recurse=True), lr=lr, weight_decay=weight_decay)
 
+train_time = time.time()
 val_loss_pre = 1e9
 val_acc_pre = 0
 dec_time = 0
@@ -90,4 +91,6 @@ for epoch in range(args.epoch):
         dec_time = 0
     val_loss_pre = val_loss
     val_acc_pre = val_acc
+
+print("total time:", time.time()-train_time)
 torch.save(gcn, "gcn_model")
