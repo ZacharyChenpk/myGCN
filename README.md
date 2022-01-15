@@ -1,7 +1,5 @@
 # Graph Convolutional Network
 
-1700012764 陈智斌
-
 This is a Pytorch implementation of Graph Convolutional Networks for the task of semi-supervised classification of nodes in a graph.
 
 
